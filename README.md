@@ -34,7 +34,7 @@ git clone https://github.com/wysh3/zen-browser-portable.git
 
 ## Usage
 - Run the browser by executing `Launcher/ZenWindowsPortable.bat` / `Launcher/ZenLinuxPortable.sh`.
-- Close the browser before unmounting the uss.
+- Close the browser before unmounting the usb/ the storage device.
 - Customize the batch script if needed to adjust paths or options.
 
 ---
