@@ -15,8 +15,9 @@ ZenBrowserPortable/
 ├── Data/
 │   └── profile/                    # Browser profile folder
 └── Launcher/
-    └── ZenWindowsPortable.bat      # Launcher script for windows
-    └── ZenLinuxPortable.sh         # Launcher script for linux
+    └── ZenWindowsPortable.bat      # Launcher script for Windows
+    └── ZenLinuxPortable.sh         # Launcher script for Linux
+
 ```
 
 ## Setup
