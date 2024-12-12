@@ -11,7 +11,7 @@ A portable setup for Zen Browser to run directly from a USB drive or any other f
 ## Folder Structure
 ```
 ZenBrowserPortable/
-├── App/                            # core files of Zen Browser
+├── App/                            # files related to Zen [ core for windows files | zen for linux files ]
 ├── Data/
 │   └── profile/                    # Browser profile folder
 └── Launcher/
