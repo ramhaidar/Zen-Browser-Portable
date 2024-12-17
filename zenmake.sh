@@ -72,6 +72,22 @@ if ! command_exists tar; then
     fi
 fi
 
+# Check for bzip2
+if ! command_exists bzip2; then
+    echo "bzip2 not found, installing..."
+    # Detect package manager and install bzip2
+    if command_exists apt-get; then
+        sudo apt-get update && sudo apt-get install -y bzip2
+    elif command_exists yum; then
+        sudo yum install -y bzip2
+    elif command_exists pacman; then
+        sudo pacman -S --noconfirm bzip2
+    else
+        echo "Error: Unable to install bzip2, please install it manually."
+        exit 1
+    fi
+fi
+
 # Set up directory structure
 mkdir -p zen-portable/{app/{win,lin},data,launcher}
 
