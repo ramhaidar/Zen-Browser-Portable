@@ -111,9 +111,9 @@ fi
 
 # Download Linux release and extract it
 echo "Downloading Linux release..."
-curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest | jq -r '.assets[] | select(.name == "zen.linux-specific.tar.bz2") | .browser_download_url' | xargs curl -LO
+curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest | jq -r '.assets[] | select(.name == "zen.linux-x86_64.tar.bz2") | .browser_download_url' | xargs curl -LO
 echo "Extracting Linux release..."
-tar -xjvf zen.linux-specific.tar.bz2 -C app/lin
+tar -xjvf zen.linux-x86_64.tar.bz2 -C app/lin
 
 # Preserve 'zen' executable from Linux release before removing the 'zen' folder
 echo "Handling 'zen' folder in Linux release..."
@@ -190,6 +190,6 @@ EOF
 
 # Clean up downloaded files
 echo "Cleaning up downloaded files..."
-rm -f zen.installer.exe zen.linux-specific.tar.bz2
+rm -f zen.installer.exe zen.linux-x86_64.tar.bz2
 
 echo "Zen Portable setup is complete!"
