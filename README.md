@@ -10,30 +10,30 @@ A portable setup for Zen Browser to run directly from a USB drive or any other f
 
 ## Folder Structure
 ```
-ZenBrowserPortable/
-├── App/                            # files related to Zen [ core for windows files | zen for linux files ]
-├── Data/
+zen-portable/
+├── app/                            # files related to Zen [ core for windows files | zen for linux files ]
+├── data/
 │   └── profile/                    # Browser profile folder
-└── Launcher/
-    └── ZenWindowsPortable.bat      # Launcher script for Windows
-    └── ZenLinuxPortable.sh         # Launcher script for Linux
+└── launcher/
+    └── zenwindowsportable.bat      # Launcher script for Windows
+    └── zenlinuxportable.sh         # Launcher script for Linux
 
 ```
 
-## Setup
 
-### Steps to Run Zen Browser(1.0.2-b.0) in portable mode: 
-1. Clone this repository or download the contents as a ZIP file:
-```bash
-git clone https://github.com/wysh3/zen-browser-portable.git
-```
-2. Unpack and transfer the "ZenBrowserPortable" folder in your usb or any other storage device.
 
-3. Mount the usb or your storage device.
+## How to Run Zen Browser(1.0.2-b.5) in portable mode: 
+1. Download the [1.0.2-b.5 beta build](https://github.com/wysh3/Zen-Browser-Portable/releases/tag/1.0.2-b.5) zip file
+   
+2. Unpack the zip and transfer the "zen-portable" folder to your usb or any other storage device
 
-4. Double-click the `Launcher/ZenBrowserPortable.bat` file to launch Zen Browser in Windows / Double-click the `Launcher/ZenLinuxPortable.sh` or try running it terminal to launch Zen Browser    in Linux.
+3. Mount the usb or your storage device
 
-### Steps to Build Zen Browser(latest) on Linux (the output file will work on both linux and windows):
+4. -> Double-click the `launcher/zenbrowserportable.bat` file to launch Zen Browser in Windows 
+
+   -> Double-click the `launcher/zenlinuxportable.sh` or try running it using terminal to launch Zen Browser in Linux.
+
+## Steps to Build Zen Browser(latest) on Linux (the output file will work on both linux and windows):
 
 1. Download the `zenmake.sh` script by cloning or downloading the zip.
 
