@@ -91,6 +91,13 @@ mkdir -p zen-linux-portable/{app/lin,data,launcher}
 mkdir -p zen-windows-portable/{app/win,data,launcher}
 mkdir -p zen-portable/{app/{win,lin},data,launcher}
 
+# Create profile directories for each version
+for dir in zen-linux-portable zen-windows-portable zen-portable; do
+    for i in {1..5}; do
+        mkdir -p "$dir/data/profile$i"
+    done
+done
+
 # Download Linux release and extract it
 echo "Downloading Linux release..."
 curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest | jq -r '.assets[] | select(.name == "zen.linux-x86_64.tar.bz2") | .browser_download_url' | xargs curl -LO
@@ -132,13 +139,36 @@ done
 # Create profile.ini for all versions
 echo "Creating profile.ini..."
 for dir in zen-linux-portable zen-windows-portable zen-portable; do
-    mkdir -p "$dir/data/profile"
     cat <<EOF > "$dir/data/profile.ini"
+[General]
+StartWithLastProfile=1
+Version=2
+
 [Profile0]
-Name=ZenPortable
+Name=Profile1
 IsRelative=1
-Path=..\data\profile
+Path=../data/profile1
 Default=1
+
+[Profile1]
+Name=Profile2
+IsRelative=1
+Path=../data/profile2
+
+[Profile2]
+Name=Profile3
+IsRelative=1
+Path=../data/profile3
+
+[Profile3]
+Name=Profile4
+IsRelative=1
+Path=../data/profile4
+
+[Profile4]
+Name=Profile5
+IsRelative=1
+Path=../data/profile5
 EOF
 done
 
@@ -148,14 +178,14 @@ cat <<EOF > zen-linux-portable/launcher/zenlinuxportable.sh
 #!/bin/bash
 APP_DIR="\$(dirname "\$0")/../app/lin"
 DATA_DIR="\$(dirname "\$0")/../data"
-"\$APP_DIR/zen" --profile "\$DATA_DIR/profile" --no-remote &>/dev/null &
+"\$APP_DIR/zen" --profile "\$DATA_DIR/profile1" --no-remote &>/dev/null &
 EOF
 
 cat <<EOF > zen-portable/launcher/zenlinuxportable.sh
 #!/bin/bash
 APP_DIR="\$(dirname "\$0")/../app/lin"
 DATA_DIR="\$(dirname "\$0")/../data"
-"\$APP_DIR/zen" --profile "\$DATA_DIR/profile" --no-remote &>/dev/null &
+"\$APP_DIR/zen" --profile "\$DATA_DIR/profile1" --no-remote &>/dev/null &
 EOF
 
 chmod +x zen-linux-portable/launcher/zenlinuxportable.sh
@@ -169,14 +199,14 @@ cat <<EOF > zen-windows-portable/launcher/zenwindowsportable.bat
 @echo off
 set APP_DIR=%~dp0..\app
 set DATA_DIR=%~dp0..\data
-"%APP_DIR%\win\zen.exe" -profile "%DATA_DIR%\profile" -no-remote
+"%APP_DIR%\win\zen.exe" -profile "%DATA_DIR%\profile1" -no-remote
 EOF
 
 cat <<EOF > zen-portable/launcher/zenwindowsportable.bat
 @echo off
 set APP_DIR=%~dp0..\app
 set DATA_DIR=%~dp0..\data
-"%APP_DIR%\win\zen.exe" -profile "%DATA_DIR%\profile" -no-remote
+"%APP_DIR%\win\zen.exe" -profile "%DATA_DIR%\profile1" -no-remote
 EOF
 
 # Clean up downloaded files
