@@ -88,59 +88,88 @@ if ! command_exists bzip2; then
     fi
 fi
 
+# Prompt user for platform choice
+echo "Select the platform(s) you want the resulting folder to support:"
+echo "1) Linux"
+echo "2) Windows"
+echo "3) Both"
+read -p "Enter the number of your choice (1, 2, or 3): " platform_choice
+
+# Set the directory name based on user input
+if [ "$platform_choice" == "1" ]; then
+    output_dir="zen-linux-portable"
+elif [ "$platform_choice" == "2" ]; then
+    output_dir="zen-windows-portable"
+else
+    output_dir="zen-portable"
+fi
+
 # Set up directory structure
-mkdir -p zen-portable/{app/{win,lin},data,launcher}
+mkdir -p "$output_dir"/data/profile
+mkdir -p "$output_dir"/launcher
 
-# Change into the zen-portable directory
-cd zen-portable
-
-# Download Windows release and extract it
-echo "Downloading Windows release..."
-curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest | jq -r '.assets[] | select(.name == "zen.installer.exe") | .browser_download_url' | xargs curl -LO
-echo "Extracting Windows release..."
-7z x zen.installer.exe -oapp/win
-
-# Copy contents from 'core' folder to 'win'
-echo "Copying contents from 'core' folder to 'win'..."
-if [ -d "app/win/core" ]; then
-    cp -r app/win/core/* app/win/
-else
-    echo "Error: 'core' folder not found after extraction!"
-    exit 1
+# Conditionally create platform-specific directories
+if [ "$platform_choice" == "2" ] || [ "$platform_choice" == "3" ]; then
+    mkdir -p "$output_dir"/app/win
+fi
+if [ "$platform_choice" == "1" ] || [ "$platform_choice" == "3" ]; then
+    mkdir -p "$output_dir"/app/lin
 fi
 
-# Download Linux release and extract it
-echo "Downloading Linux release..."
-curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest | jq -r '.assets[] | select(.name == "zen.linux-x86_64.tar.bz2") | .browser_download_url' | xargs curl -LO
-echo "Extracting Linux release..."
-tar -xjvf zen.linux-x86_64.tar.bz2 -C app/lin
+# Change into the output directory
+cd "$output_dir"
 
-# Preserve 'zen' executable from Linux release before removing the 'zen' folder
-echo "Handling 'zen' folder in Linux release..."
-if [ -d "app/lin/zen" ]; then
-    # Move the zen executable out temporarily before copying other files
-    if [ -f "app/lin/zen/zen" ]; then
-        mv app/lin/zen/zen app/lin/zen-executable
+# Handle platform-specific logic
+if [ "$platform_choice" == "1" ] || [ "$platform_choice" == "3" ]; then
+    # Download Linux release and extract it
+    echo "Downloading Linux release..."
+    curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest | jq -r '.assets[] | select(.name == "zen.linux-x86_64.tar.bz2") | .browser_download_url' | xargs curl -LO
+    echo "Extracting Linux release..."
+    tar -xjvf zen.linux-x86_64.tar.bz2 -C app/lin
+
+    # Preserve 'zen' executable from Linux release before removing the 'zen' folder
+    echo "Handling 'zen' folder in Linux release..."
+    if [ -d "app/lin/zen" ]; then
+        # Move the zen executable out temporarily before copying other files
+        if [ -f "app/lin/zen/zen" ]; then
+            mv app/lin/zen/zen app/lin/zen-executable
+        fi
+
+        # Copy all contents from 'zen' to 'lin'
+        cp -r app/lin/zen/* app/lin/
+
+        # Remove the 'zen' folder (but the 'zen' executable was moved out already)
+        rm -rf app/lin/zen
+
+        # Restore the 'zen' executable back into 'lin'
+        if [ -f "app/lin/zen-executable" ]; then
+            mv app/lin/zen-executable app/lin/zen
+        fi
+    else
+        echo "Error: 'zen' folder not found after extraction!"
+        exit 1
     fi
-
-    # Copy all contents from 'zen' to 'lin'
-    cp -r app/lin/zen/* app/lin/
-
-    # Remove the 'zen' folder (but the 'zen' executable was moved out already)
-    rm -rf app/lin/zen
-
-    # Restore the 'zen' executable back into 'lin'
-    if [ -f "app/lin/zen-executable" ]; then
-        mv app/lin/zen-executable app/lin/zen
-    fi
-else
-    echo "Error: 'zen' folder not found after extraction!"
-    exit 1
 fi
 
-# Create profile and profile.ini
-echo "Creating profile directory and profile.ini..."
-mkdir -p data/profile
+if [ "$platform_choice" == "2" ] || [ "$platform_choice" == "3" ]; then
+    # Download Windows release and extract it
+    echo "Downloading Windows release..."
+    curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest | jq -r '.assets[] | select(.name == "zen.installer.exe") | .browser_download_url' | xargs curl -LO
+    echo "Extracting Windows release..."
+    7z x zen.installer.exe -oapp/win
+
+    # Copy contents from 'core' folder to 'win'
+    echo "Copying contents from 'core' folder to 'win'..."
+    if [ -d "app/win/core" ]; then
+        cp -r app/win/core/* app/win/
+    else
+        echo "Error: 'core' folder not found after extraction!"
+        exit 1
+    fi
+fi
+
+# Create profile.ini
+echo "Creating profile.ini..."
 cat <<EOF > data/profile.ini
 [Profile0]
 Name=ZenPortable
@@ -150,21 +179,24 @@ Default=1
 EOF
 
 # Create Linux launcher script (zenlinuxportable.sh)
-echo "Creating Linux launcher script..."
-cat <<EOF > launcher/zenlinuxportable.sh
+if [ "$platform_choice" == "1" ] || [ "$platform_choice" == "3" ]; then
+    echo "Creating Linux launcher script..."
+    cat <<EOF > launcher/zenlinuxportable.sh
 #!/bin/bash
 APP_DIR="\$(dirname "\$0")/../app/lin"
 DATA_DIR="\$(dirname "\$0")/../data"
 "\$APP_DIR/zen" --profile "\$DATA_DIR/profile" --no-remote &>/dev/null &
 EOF
 
-# Ensure Linux launcher is executable
-chmod +x launcher/zenlinuxportable.sh
-chmod +x app/lin/zen  # Ensure the Zen executable is also executable
+    # Ensure Linux launcher is executable
+    chmod +x launcher/zenlinuxportable.sh
+    chmod +x app/lin/zen  # Ensure the Zen executable is also executable
+fi
 
 # Create Windows launcher script (zenwindowsportable.bat)
-echo "Creating Windows launcher script..."
-cat <<EOF > launcher/zenwindowsportable.bat
+if [ "$platform_choice" == "2" ] || [ "$platform_choice" == "3" ]; then
+    echo "Creating Windows launcher script..."
+    cat <<EOF > launcher/zenwindowsportable.bat
 @echo off
 :: Set application directory
 set APP_DIR=%~dp0..\app
@@ -187,9 +219,20 @@ if not exist "%DATA_DIR%\profile" (
 :: Launch Zen Browser in portable mode
 "%APP_DIR%\win\zen.exe" -profile "%DATA_DIR%\profile" -no-remote
 EOF
+fi
 
 # Clean up downloaded files
 echo "Cleaning up downloaded files..."
 rm -f zen.installer.exe zen.linux-x86_64.tar.bz2
+
+# Go back to the parent directory where the output directory exists
+cd ..
+
+# Create the zip archive before cleaning up
+echo "Creating the zip archive..."
+zip -r "$output_dir.zip" "$output_dir"
+
+# Clean up the output directory after zipping
+rm -rf "$output_dir"
 
 echo "Zen Portable setup is complete!"
