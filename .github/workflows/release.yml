@@ -1,5 +1,4 @@
 name: Check for new release and build Zen Browser
-
 on:
   schedule:
     - cron: '0 0 * * *'  # Run once a day at midnight UTC
@@ -8,46 +7,70 @@ on:
 jobs:
   check-for-new-release:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-
+        with:
+          fetch-depth: 0  # Fetch all history and tags
+          
       - name: Get the latest release from Zen Browser
         id: get_latest_release
         run: |
-          # Fetch the latest release from Zen Browser repo
-          latest_release=$(curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest)
-          tag_name=$(echo $latest_release | jq -r '.tag_name')
-          echo "tag_name=$tag_name" >> $GITHUB_ENV  # Store the tag name in the environment variable
+          # Fetch the latest release with error handling
+          response=$(curl -sL -w "%{http_code}" https://api.github.com/repos/zen-browser/desktop/releases/latest -o response.json)
+          if [ "$response" != "200" ]; then
+            echo "Error: Failed to fetch latest release (HTTP $response)"
+            exit 1
+          fi
+          tag_name=$(jq -r '.tag_name' response.json)
+          if [ -z "$tag_name" ] || [ "$tag_name" = "null" ]; then
+            echo "Error: Could not parse tag name from response"
+            exit 1
+          fi
+          echo "TAG_NAME=$tag_name" >> $GITHUB_ENV
 
       - name: Check if the release exists locally
         id: check_local_tag
         run: |
-          # Check if the release already exists as a Git tag locally
-          if git tag -l "$tag_name" > /dev/null 2>&1; then
-            echo "Release $tag_name already exists locally. Skipping build."
-            exit 0  # Exit early if the tag exists
+          if git rev-parse "refs/tags/${{ env.TAG_NAME }}" >/dev/null 2>&1; then
+            echo "SHOULD_BUILD=false" >> $GITHUB_ENV
+            echo "Release ${{ env.TAG_NAME }} already exists locally. Skipping build."
+          else
+            echo "SHOULD_BUILD=true" >> $GITHUB_ENV
+            echo "No matching release found. Proceeding with build."
           fi
-          echo "No matching release found. Proceeding with build."  # Only prints if the tag does not exist
 
       - name: Grant execution permissions to build script
-        run: chmod +x ./zenmake_for_dev.sh  # Ensure the build script is executable
+        if: env.SHOULD_BUILD == 'true'
+        run: chmod +x ./zenmake_for_dev.sh
 
       - name: Run the build script to create release
-        if: success()  # Proceed only if the release was not found locally
-        run: |
-          ./zenmake_for_dev.sh  # Run the build script
+        if: env.SHOULD_BUILD == 'true'
+        run: ./zenmake_for_dev.sh
 
-      - name: Set up GitHub CLI authentication
+      - name: Verify build artifacts exist
+        if: env.SHOULD_BUILD == 'true'
         run: |
-          echo "GH_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+          for file in zen-linux-portable.zip zen-windows-portable.zip zen-portable.zip; do
+            if [ ! -f "$file" ]; then
+              echo "Error: Build artifact $file is missing"
+              exit 1
+            fi
+          done
 
       - name: Create release on GitHub and upload assets
-        if: success()  # Proceed only if the build was successful
-        run: |
-          # Use GitHub CLI to create the release and upload the assets
-          gh release create "$tag_name" zen-linux-portable.zip zen-windows-portable.zip zen-portable.zip \
-          --title "Zen Browser $tag_name" --notes "Automated build for release $tag_name" --repo $GITHUB_REPOSITORY
+        if: env.SHOULD_BUILD == 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Pass the built-in GitHub token for authentication
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Create release with error handling
+          if ! gh release create "${{ env.TAG_NAME }}" \
+            zen-linux-portable.zip \
+            zen-windows-portable.zip \
+            zen-portable.zip \
+            --title "Zen Browser ${{ env.TAG_NAME }}" \
+            --notes "Automated build for release ${{ env.TAG_NAME }}" \
+            --repo ${{ github.repository }}; then
+            echo "Error: Failed to create release"
+            exit 1
+          fi
