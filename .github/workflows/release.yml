@@ -43,5 +43,7 @@ jobs:
       - name: Create release in this repo
         if: success()  # Proceed if the build was successful
         run: |
-          # Upload the generated zip files to the release section in this repo
-          gh release create "$tag_name" zen-linux-portable.zip zen-windows-portable.zip zen-portable.zip --title "Zen Browser $tag_name" --notes "Automated build for release $tag_name"
+          # Use GitHub CLI to create the release and upload the assets
+          gh release create "$tag_name" zen-linux-portable.zip zen-windows-portable.zip zen-portable.zip --title "Zen Browser $tag_name" --notes "Automated build for release $tag_name" --repo $GITHUB_REPOSITORY
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Pass the built-in GitHub token for authentication
