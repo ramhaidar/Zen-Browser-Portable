@@ -13,37 +13,51 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Check for new release from Zen Browser
+      # Step 1: Fetch the latest release from Zen Browser repo
+      - name: Get the latest release from Zen Browser
         id: get_latest_release
         run: |
-          # Fetch the latest release from Zen Browser repo
           latest_release=$(curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest)
-          echo "Latest release: $latest_release"
           tag_name=$(echo $latest_release | jq -r '.tag_name')
           echo "tag_name=$tag_name" >> $GITHUB_ENV
 
-      - name: Check if this release was already built
+      # Step 2: Check if this release already exists as a Git tag in the current repo
+      - name: Check if the release already exists as a Git tag
         id: check_if_built
         run: |
-          # Check if the release already exists in this repository's tags
-          if [[ "$(git tag -l "$tag_name")" != "" ]]; then
+          if git tag -l "$tag_name" > /dev/null 2>&1; then
             echo "Release $tag_name already exists. Skipping build."
-            exit 0  # Exit without error if the release exists
+            exit 0  # Exit without error if the release already exists
           fi
           echo "No matching release found. Proceeding with build."
 
+      # Step 3: Grant execution permissions to the build script
       - name: Grant execution permissions to build script
         run: chmod +x ./zenmake_for_dev.sh  # Make the build script executable
 
+      # Step 4: Run the build script to create release files (only if the release doesn't already exist)
       - name: Run the build script to create release
-        if: success()  # Proceed if no previous build was found
+        if: success()  # Proceed only if no previous build was found
         run: |
           ./zenmake_for_dev.sh  # Your existing build script
 
-      - name: Create release in this repo
-        if: success()  # Proceed if the build was successful
+      # Step 5: Check if the release exists on GitHub
+      - name: Check if the release exists on GitHub
+        id: check_release_on_github
         run: |
-          # Use GitHub CLI to create the release and upload the assets
-          gh release create "$tag_name" zen-linux-portable.zip zen-windows-portable.zip zen-portable.zip --title "Zen Browser $tag_name" --notes "Automated build for release $tag_name" --repo $GITHUB_REPOSITORY
+          release_exists=$(gh release view "$tag_name" --json tagName --jq ".tagName" || echo "not found")
+          if [[ "$release_exists" != "$tag_name" ]]; then
+            echo "Release does not exist on GitHub, creating release."
+          else
+            echo "Release $tag_name already exists on GitHub. Skipping release creation."
+            exit 0  # Exit without error if the release already exists
+          fi
+
+      # Step 6: Create the release on GitHub and upload the release files
+      - name: Create release on GitHub and upload assets
+        if: success()  # Proceed only if the release wasn't found on GitHub
+        run: |
+          gh release create "$tag_name" zen-linux-portable.zip zen-windows-portable.zip zen-portable.zip \
+          --title "Zen Browser $tag_name" --notes "Automated build for release $tag_name" --repo $GITHUB_REPOSITORY
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Pass the built-in GitHub token for authentication
