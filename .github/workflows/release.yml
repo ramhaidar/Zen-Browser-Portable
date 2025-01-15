@@ -41,7 +41,12 @@ jobs:
         run: |
           ./zenmake_for_dev.sh  # Your existing build script
 
-      # Step 5: Check if the release exists on GitHub
+      # Step 5: Ensure GH_TOKEN is set up for GitHub CLI authentication
+      - name: Set up GitHub CLI authentication
+        run: |
+          echo "GH_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+
+      # Step 6: Check if the release exists on GitHub
       - name: Check if the release exists on GitHub
         id: check_release_on_github
         run: |
@@ -50,14 +55,14 @@ jobs:
             echo "Release does not exist on GitHub, creating release."
           else
             echo "Release $tag_name already exists on GitHub. Skipping release creation."
-            exit 0  # Exit without error if the release already exists
+            exit 0  # Exit without error if the release already exists on GitHub
           fi
 
-      # Step 6: Create the release on GitHub and upload the release files
+      # Step 7: Create the release on GitHub and upload assets
       - name: Create release on GitHub and upload assets
         if: success()  # Proceed only if the release wasn't found on GitHub
         run: |
           gh release create "$tag_name" zen-linux-portable.zip zen-windows-portable.zip zen-portable.zip \
           --title "Zen Browser $tag_name" --notes "Automated build for release $tag_name" --repo $GITHUB_REPOSITORY
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Pass the built-in GitHub token for authentication
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Ensure authentication
