@@ -1,10 +1,9 @@
-name: Check for Zen Browser New Release and Build
+name: Check for new release and build Zen Browser
 
-# This job runs on a schedule every day at midnight
 on:
   schedule:
-    - cron: '0 0 * * *'  # Runs once a day at midnight UTC
-  workflow_dispatch: # Allows you to manually trigger the workflow
+    - cron: '0 0 * * *'  # Run once a day at midnight UTC
+  workflow_dispatch:  # Allow manual triggering
 
 jobs:
   check-for-new-release:
@@ -17,6 +16,7 @@ jobs:
       - name: Check for new release from Zen Browser
         id: get_latest_release
         run: |
+          # Fetch the latest release from Zen Browser repo
           latest_release=$(curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest)
           echo "Latest release: $latest_release"
           tag_name=$(echo $latest_release | jq -r '.tag_name')
@@ -25,21 +25,23 @@ jobs:
       - name: Check if this release was already built
         id: check_if_built
         run: |
-          # Check if the release already exists in the current repo
+          # Check if the release already exists in this repository's tags
           if [[ "$(git tag -l "$tag_name")" != "" ]]; then
             echo "Release $tag_name already exists. Skipping build."
-            exit 0  # Skip the build
+            exit 0  # Exit without error if the release exists
           fi
           echo "No matching release found. Proceeding with build."
+
+      - name: Grant execution permissions to build script
+        run: chmod +x ./zenmake_for_dev.sh  # Make the build script executable
 
       - name: Run the build script to create release
         if: success()  # Proceed if no previous build was found
         run: |
-          # Run the build script to generate releases
           ./zenmake_for_dev.sh  # Your existing build script
 
       - name: Create release in this repo
-        if: success()
+        if: success()  # Proceed if the build was successful
         run: |
-          # Upload .zip files to this repo's release section
+          # Upload the generated zip files to the release section in this repo
           gh release create "$tag_name" zen-linux-portable.zip zen-windows-portable.zip zen-portable.zip --title "Zen Browser $tag_name" --notes "Automated build for release $tag_name"
