@@ -12,6 +12,8 @@ A portable setup for Zen Browser to run directly from a USB drive or any other f
 ```
 zen-portable/
 ├── app/                            # files related to Zen [ core for windows files | zen for linux files ]
+│   └── lin/
+│   └── win/
 ├── data/
 │   └── profile/                    # Browser profile folder
 └── launcher/
