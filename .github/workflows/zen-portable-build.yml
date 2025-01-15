@@ -80,7 +80,7 @@ jobs:
             zen-linux-portable.zip \
             zen-windows-portable.zip \
             zen-portable.zip \
-            --title "Zen Browser ${{ env.TAG_NAME }}" \
+            --title "Zen Portable ${{ env.TAG_NAME }}" \
             --notes "Automated build for release ${{ env.TAG_NAME }}" \
             --repo ${{ github.repository }}; then
             echo "Error: Failed to create release"
