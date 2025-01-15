@@ -1,0 +1,54 @@
+name: Zen Browser Release Automation
+
+on:
+  release:
+    types: [published]
+    # Trigger only for stable releases
+    tags:
+      - 'v*.*b'  # Example pattern for stable versions (e.g., 1.6b, 1.7b)
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the repository to the runner
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Set up GitHub authentication to use the GitHub token
+    - name: Set up GitHub Token
+      run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
+
+    # Set up Node.js (if needed for building the browser, this step can be customized)
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    # Install dependencies for building Zen Browser Portable
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y curl jq p7zip-full tar bzip2
+
+    # Download the release from Zen Browser repo and build Zen Browser Portable
+    - name: Build Zen Browser Portable
+      run: |
+        bash zenmake_for_dev.sh
+
+    # Upload the zip files as GitHub release assets
+    - name: Upload release assets
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          zen-linux-portable.zip
+          zen-windows-portable.zip
+          zen-portable.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+    # Clean up after release (optional)
+    - name: Clean up
+      run: |
+        rm -f zen-linux-portable.zip zen-windows-portable.zip zen-portable.zip
