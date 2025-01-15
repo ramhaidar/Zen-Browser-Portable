@@ -25,9 +25,9 @@ zen-portable/
 
 
 ## How to Run Zen Browser(1.0.2-b.5) in portable mode: 
-1. Download the [1.0.2-b.5 beta build](https://github.com/wysh3/Zen-Browser-Portable/releases/tag/1.0.2-b.5) zip file
+1. Download the latest [zen portable](https://github.com/wysh3/Zen-Browser-Portable/releases) zip file
    
-2. Unpack the zip and transfer the "zen-portable" folder to your usb or any other storage device
+2. Unpack the zip and transfer the folder to your usb or any other storage device
 
 3. Mount the usb or your storage device
 
@@ -37,7 +37,7 @@ zen-portable/
 
 ## Steps to Build Zen Browser(latest) on Linux (the output file will work on both linux and windows):
 
-1. Download the `zenmake.sh` script by cloning or downloading the zip.
+1. Download the `zenmake.sh` script.
 
 2. Make the `zenmake.sh` script executable by running:
     ```bash
@@ -49,9 +49,9 @@ zen-portable/
     ./zenmake.sh
     ```
 
-4. The script will output `zen-portable` folder.
+4. The script will output your desired folder zip.
 
-5. Transfer the folder to your USB or other storage device.
+5. Unzip and transfer the folder to your USB or other storage device.
 
 6. Once transferred, you can launch Zen Browser on your storage device by running `./zenlinuxportable.sh` on Linux or by running `./zenwindowsportable.bat` on Windows machine.
 
