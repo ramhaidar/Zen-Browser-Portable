@@ -1,54 +1,45 @@
-name: Zen Browser Release Automation
+name: Check for Zen Browser New Release and Build
 
+# This job runs on a schedule every day at midnight
 on:
-  release:
-    types: [published]
-    # Trigger only for stable releases
-    tags:
-      - 'v*.*b'  # Example pattern for stable versions (e.g., 1.6b, 1.7b)
+  schedule:
+    - cron: '0 0 * * *'  # Runs once a day at midnight UTC
+  workflow_dispatch: # Allows you to manually trigger the workflow
 
 jobs:
-  release:
+  check-for-new-release:
     runs-on: ubuntu-latest
 
     steps:
-    # Checkout the repository to the runner
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-    # Set up GitHub authentication to use the GitHub token
-    - name: Set up GitHub Token
-      run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
+      - name: Check for new release from Zen Browser
+        id: get_latest_release
+        run: |
+          latest_release=$(curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest)
+          echo "Latest release: $latest_release"
+          tag_name=$(echo $latest_release | jq -r '.tag_name')
+          echo "tag_name=$tag_name" >> $GITHUB_ENV
 
-    # Set up Node.js (if needed for building the browser, this step can be customized)
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'
+      - name: Check if this release was already built
+        id: check_if_built
+        run: |
+          # Check if the release already exists in the current repo
+          if [[ "$(git tag -l "$tag_name")" != "" ]]; then
+            echo "Release $tag_name already exists. Skipping build."
+            exit 0  # Skip the build
+          fi
+          echo "No matching release found. Proceeding with build."
 
-    # Install dependencies for building Zen Browser Portable
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y curl jq p7zip-full tar bzip2
+      - name: Run the build script to create release
+        if: success()  # Proceed if no previous build was found
+        run: |
+          # Run the build script to generate releases
+          ./zenmake_for_dev.sh  # Your existing build script
 
-    # Download the release from Zen Browser repo and build Zen Browser Portable
-    - name: Build Zen Browser Portable
-      run: |
-        bash zenmake_for_dev.sh
-
-    # Upload the zip files as GitHub release assets
-    - name: Upload release assets
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          zen-linux-portable.zip
-          zen-windows-portable.zip
-          zen-portable.zip
-      env:
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-
-    # Clean up after release (optional)
-    - name: Clean up
-      run: |
-        rm -f zen-linux-portable.zip zen-windows-portable.zip zen-portable.zip
+      - name: Create release in this repo
+        if: success()
+        run: |
+          # Upload .zip files to this repo's release section
+          gh release create "$tag_name" zen-linux-portable.zip zen-windows-portable.zip zen-portable.zip --title "Zen Browser $tag_name" --notes "Automated build for release $tag_name"
