@@ -1,8 +1,12 @@
 name: Check for new release and build Zen Browser
 on:
   schedule:
-    - cron: '0 0 * * *'  # Run once a day at midnight UTC
-  workflow_dispatch:  # Allow manual triggering
+    - cron: '0 0 * * *'  # Run daily at midnight UTC
+  workflow_dispatch:      # Allow manual runs
+
+permissions:
+  contents: write
+  packages: write
 
 jobs:
   check-for-new-release:
@@ -11,13 +15,14 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Fetch all history and tags
+          fetch-depth: 0  # Get all tags
           
       - name: Get the latest release from Zen Browser
         id: get_latest_release
         run: |
-          # Fetch the latest release with error handling
-          response=$(curl -sL -w "%{http_code}" https://api.github.com/repos/zen-browser/desktop/releases/latest -o response.json)
+          response=$(curl -sL -w "%{http_code}" \
+            -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
+            https://api.github.com/repos/zen-browser/desktop/releases/latest -o response.json)
           if [ "$response" != "200" ]; then
             echo "Error: Failed to fetch latest release (HTTP $response)"
             exit 1
@@ -28,6 +33,7 @@ jobs:
             exit 1
           fi
           echo "TAG_NAME=$tag_name" >> $GITHUB_ENV
+          echo "Latest version: $tag_name"
 
       - name: Check if the release exists locally
         id: check_local_tag
@@ -40,15 +46,21 @@ jobs:
             echo "No matching release found. Proceeding with build."
           fi
 
+      - name: Set up build environment
+        if: env.SHOULD_BUILD == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zip unzip
+
       - name: Grant execution permissions to build script
         if: env.SHOULD_BUILD == 'true'
         run: chmod +x ./zenmake_for_dev.sh
 
-      - name: Run the build script to create release
+      - name: Run the build script
         if: env.SHOULD_BUILD == 'true'
         run: ./zenmake_for_dev.sh
 
-      - name: Verify build artifacts exist
+      - name: Verify build artifacts
         if: env.SHOULD_BUILD == 'true'
         run: |
           for file in zen-linux-portable.zip zen-windows-portable.zip zen-portable.zip; do
@@ -58,12 +70,12 @@ jobs:
             fi
           done
 
-      - name: Create release on GitHub and upload assets
+      - name: Create GitHub Release
         if: env.SHOULD_BUILD == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
-          # Create release with error handling
+          echo "Creating release ${{ env.TAG_NAME }}..."
           if ! gh release create "${{ env.TAG_NAME }}" \
             zen-linux-portable.zip \
             zen-windows-portable.zip \
