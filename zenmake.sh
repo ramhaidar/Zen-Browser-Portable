@@ -105,7 +105,11 @@ else
 fi
 
 # Set up directory structure
-mkdir -p "$output_dir"/data/profile
+mkdir -p "$output_dir"/data
+# Create 5 profile directories
+for i in {1..5}; do
+    mkdir -p "$output_dir/data/profile$i"
+done
 mkdir -p "$output_dir"/launcher
 
 # Conditionally create platform-specific directories
@@ -168,24 +172,48 @@ if [ "$platform_choice" == "2" ] || [ "$platform_choice" == "3" ]; then
     fi
 fi
 
-# Create profile.ini
+# Create profile.ini with 5 profiles
 echo "Creating profile.ini..."
 cat <<EOF > data/profile.ini
+[General]
+StartWithLastProfile=1
+Version=2
+
 [Profile0]
-Name=ZenPortable
+Name=Profile1
 IsRelative=1
-Path=..\data\profile
+Path=../data/profile1
 Default=1
+
+[Profile1]
+Name=Profile2
+IsRelative=1
+Path=../data/profile2
+
+[Profile2]
+Name=Profile3
+IsRelative=1
+Path=../data/profile3
+
+[Profile3]
+Name=Profile4
+IsRelative=1
+Path=../data/profile4
+
+[Profile4]
+Name=Profile5
+IsRelative=1
+Path=../data/profile5
 EOF
 
-# Create Linux launcher script (zenlinuxportable.sh)
+# Create Linux launcher script
 if [ "$platform_choice" == "1" ] || [ "$platform_choice" == "3" ]; then
     echo "Creating Linux launcher script..."
     cat <<EOF > launcher/zenlinuxportable.sh
 #!/bin/bash
 APP_DIR="\$(dirname "\$0")/../app/lin"
 DATA_DIR="\$(dirname "\$0")/../data"
-"\$APP_DIR/zen" --profile "\$DATA_DIR/profile" --no-remote &>/dev/null &
+"\$APP_DIR/zen" --profile "\$DATA_DIR/profile1" --no-remote &>/dev/null &
 EOF
 
     # Ensure Linux launcher is executable
@@ -193,7 +221,7 @@ EOF
     chmod +x app/lin/zen  # Ensure the Zen executable is also executable
 fi
 
-# Create Windows launcher script (zenwindowsportable.bat)
+# Create Windows launcher script
 if [ "$platform_choice" == "2" ] || [ "$platform_choice" == "3" ]; then
     echo "Creating Windows launcher script..."
     cat <<EOF > launcher/zenwindowsportable.bat
@@ -210,14 +238,14 @@ if not exist "%APP_DIR%\win\zen.exe" (
     exit /b 1
 )
 
-:: Ensure profile directory exists, or create it
-if not exist "%DATA_DIR%\profile" (
-    echo Profile directory not found. Creating one at "%DATA_DIR%\profile".
-    mkdir "%DATA_DIR%\profile"
+:: Ensure profile directory exists
+if not exist "%DATA_DIR%\profile1" (
+    echo Profile directory not found. Creating one at "%DATA_DIR%\profile1".
+    mkdir "%DATA_DIR%\profile1"
 )
 
 :: Launch Zen Browser in portable mode
-"%APP_DIR%\win\zen.exe" -profile "%DATA_DIR%\profile" -no-remote
+"%APP_DIR%\win\zen.exe" -profile "%DATA_DIR%\profile1" -no-remote
 EOF
 fi
 
@@ -235,4 +263,4 @@ zip -r "$output_dir.zip" "$output_dir"
 # Clean up the output directory after zipping
 rm -rf "$output_dir"
 
-echo "Zen Portable setup is complete!"
+echo "Zen Portable version has been created and packaged successfully!"
