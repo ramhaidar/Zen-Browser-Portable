@@ -24,7 +24,7 @@ zen-portable/
 
 
 
-## How to Run Zen Browser(1.0.2-b.5) in portable mode: 
+## How to Run Zen Browser in portable mode: 
 1. Download the latest [zen portable](https://github.com/wysh3/Zen-Browser-Portable/releases) zip file
    
 2. Unpack the zip and transfer the folder to your usb or any other storage device
