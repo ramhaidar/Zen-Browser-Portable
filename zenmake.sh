@@ -72,18 +72,18 @@ if ! command_exists tar; then
     fi
 fi
 
-# Check for bzip2
-if ! command_exists bzip2; then
-    echo "bzip2 not found, installing..."
-    # Detect package manager and install bzip2
+# Check for xz-utils
+if ! command_exists xz; then
+    echo "xz-utils not found, installing..."
+    # Detect package manager and install xz-utils
     if command_exists apt-get; then
-        sudo apt-get update && sudo apt-get install -y bzip2
+        sudo apt-get update && sudo apt-get install -y xz-utils
     elif command_exists yum; then
-        sudo yum install -y bzip2
+        sudo yum install -y xz
     elif command_exists pacman; then
-        sudo pacman -S --noconfirm bzip2
+        sudo pacman -S --noconfirm xz
     else
-        echo "Error: Unable to install bzip2, please install it manually."
+        echo "Error: Unable to install xz-utils, please install it manually."
         exit 1
     fi
 fi
@@ -127,9 +127,9 @@ cd "$output_dir"
 if [ "$platform_choice" == "1" ] || [ "$platform_choice" == "3" ]; then
     # Download Linux release and extract it
     echo "Downloading Linux release..."
-    curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest | jq -r '.assets[] | select(.name == "zen.linux-x86_64.tar.bz2") | .browser_download_url' | xargs curl -LO
+    curl -s https://api.github.com/repos/zen-browser/desktop/releases/latest | jq -r '.assets[] | select(.name == "zen.linux-x86_64.tar.xz") | .browser_download_url' | xargs curl -LO
     echo "Extracting Linux release..."
-    tar -xjvf zen.linux-x86_64.tar.bz2 -C app/lin
+    tar -xJvf zen.linux-x86_64.tar.xz -C app/lin
 
     # Preserve 'zen' executable from Linux release before removing the 'zen' folder
     echo "Handling 'zen' folder in Linux release..."
@@ -251,7 +251,7 @@ fi
 
 # Clean up downloaded files
 echo "Cleaning up downloaded files..."
-rm -f zen.installer.exe zen.linux-x86_64.tar.bz2
+rm -f zen.installer.exe zen.linux-x86_64.tar.xz
 
 # Go back to the parent directory where the output directory exists
 cd ..
