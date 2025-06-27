@@ -18,6 +18,8 @@
 
 🔹 **Fully Portable** - Run from USB drives, external storage, or any folder  
 🔹 **Cross-Platform** - Works seamlessly on Windows, Linux, and macOS  
+🔹 **Auto-Updated** - Automated CI/CD builds latest Zen Browser releases daily  
+🔹 **Multi-Architecture** - Supports x86_64, ARM64, and Universal builds  
 🔹 **Self-Contained** - All user data stored in local `Data` directory  
 🔹 **Zero Installation** - No system modifications required  
 🔹 **Privacy-Focused** - Complete control over your browsing data  
@@ -45,7 +47,16 @@ zen-portable/
 
 ### 📥 Option 1: Download Pre-built Release
 
+> 🔄 **Automated Builds**: Our CI/CD pipeline automatically checks for new Zen Browser releases daily at midnight UTC and builds portable versions for all platforms!
+
 1. **Download** the latest [Zen Browser Portable](https://github.com/ramhaidar/Zen-Browser-Portable/releases) release
+   - 🐧 `zen-linux-x86_64-portable.zip` - Linux x86_64 (64-bit)
+   - 🐧 `zen-linux-aarch64-portable.zip` - Linux ARM64
+   - 🪟 `zen-windows-x86_64-portable.zip` - Windows x86_64 (64-bit)
+   - 🪟 `zen-windows-arm64-portable.zip` - Windows ARM64
+   - 🍎 `zen-macos-universal-portable.zip` - macOS Universal (Intel & Apple Silicon)
+   - 📦 `zen-portable.zip` - All platforms in one package
+
 2. **Extract** the ZIP file to your desired location (USB drive, folder, etc.)
 3. **Navigate** to the extracted folder
 4. **Launch** the browser:
@@ -54,6 +65,8 @@ zen-portable/
    - **macOS**: Double-click `launcher/zenmacosportable.sh` or run via terminal
 
 > 💡 **Tip**: Your portable browser is now ready to use! All data will be saved in the `data/` folder.
+> 
+> ⚡ **Update Schedule**: New releases are automatically built daily when Zen Browser updates are detected. You can also trigger manual builds anytime!
 
 ---
 
@@ -148,13 +161,40 @@ This will remove all generated ZIP files, extracted directories, and temporary b
 - ✅ **Safe Exit**: Always close the browser completely before unmounting your storage device
 - ⚙️ **Customization**: Modify the launcher scripts to adjust paths or add custom options
 - 💾 **Data Persistence**: All your bookmarks, history, and settings are automatically saved to the `data/` folder
-- 🔄 **Updates**: To update, simply replace the `app/` folder with a newer version while keeping your `data/` folder intact
+- 🔄 **Auto-Updates**: New releases are automatically built and published when Zen Browser updates - just download the latest release!
+- 🎯 **Platform Selection**: Download only the package you need, or get the universal package for all platforms
 - 🧹 **Cleanup**: Use the provided cleanup scripts (`clean_build_artifacts.sh` or `clean_build_artifacts.ps1`) to remove build artifacts after creating your portable packages
 - 🖥️ **Cross-Platform Building**: Choose between Bash scripts (Linux/macOS) or PowerShell scripts (Windows) for building portable packages
+- ⚡ **Stay Current**: Check the releases page regularly for the latest Zen Browser updates in portable format
 
 ---
 
 ## ❓ FAQ
+
+<details>
+<summary><strong>How are releases automatically updated?</strong></summary>
+Our GitHub Actions workflow runs daily at midnight UTC to check for new Zen Browser releases. When a new version is detected, it automatically:
+<ul>
+<li>🔍 Detects the latest Zen Browser release</li>
+<li>🏗️ Builds portable versions for all supported platforms</li>
+<li>📦 Creates platform-specific ZIP packages</li>
+<li>🚀 Publishes a new release with all portable versions</li>
+<li>✅ Ensures you get the latest Zen Browser in portable format (within 24 hours of upstream release)</li>
+</ul>
+You can also trigger manual builds immediately using the "Run workflow" button in the Actions tab.
+</details>
+
+<details>
+<summary><strong>What platforms are automatically built?</strong></summary>
+Our automated build system creates portable packages for:
+<ul>
+<li>🐧 <strong>Linux</strong>: x86_64 and ARM64 (aarch64) architectures</li>
+<li>🪟 <strong>Windows</strong>: x86_64 and ARM64 architectures</li>
+<li>🍎 <strong>macOS</strong>: Universal binaries (Intel and Apple Silicon)</li>
+<li>📦 <strong>Universal</strong>: All platforms combined in one package</li>
+</ul>
+Each release includes individual platform packages plus a universal package containing all platforms.
+</details>
 
 <details>
 <summary><strong>Does this work on macOS?</strong></summary>
@@ -190,6 +230,9 @@ We welcome contributions! Please feel free to:
 - 💡 Suggest features
 - 🔧 Submit pull requests
 - 📖 Improve documentation
+- ⚙️ Enhance the CI/CD automation workflow
+
+> 🔄 **Note**: Our automated build system ensures releases stay current with Zen Browser updates. If you notice any issues with the automation, please report them!
 
 ---
 
