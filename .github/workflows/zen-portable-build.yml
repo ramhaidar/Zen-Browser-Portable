@@ -57,11 +57,11 @@ jobs:
 
       - name: Grant execution permissions to build script
         if: env.SHOULD_BUILD == 'true'
-        run: chmod +x ./zenmake_for_dev_multiplatform.sh
+        run: chmod +x ./zenmake_auto.sh
 
       - name: Run the build script
         if: env.SHOULD_BUILD == 'true'
-        run: ./zenmake_for_dev_multiplatform.sh
+        run: ./zenmake_auto.sh
 
       - name: Verify build artifacts
         if: env.SHOULD_BUILD == 'true'
