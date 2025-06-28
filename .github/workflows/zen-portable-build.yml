@@ -1,7 +1,7 @@
 name: Check for new release and build Zen Browser
 on:
   schedule:
-    - cron: '0 0 * * *'  # Run daily at midnight UTC
+    - cron: '0 0 * * *'   # Run daily at midnight UTC
   workflow_dispatch:      # Allow manual runs
 
 permissions:
@@ -11,11 +11,14 @@ permissions:
 jobs:
   check-for-new-release:
     runs-on: ubuntu-latest
+    outputs:
+      tag_name: ${{ steps.get_latest_release.outputs.tag_name }}
+      should_build: ${{ steps.check_local_tag.outputs.should_build }}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Get all tags
+          fetch-depth: 0   # Get all tags
           
       - name: Get the latest release from Zen Browser
         id: get_latest_release
@@ -28,36 +31,36 @@ jobs:
             echo "Error: Could not get latest release tag name"
             exit 1
           fi
-          echo "TAG_NAME=$tag_name" >> $GITHUB_ENV
+          echo "tag_name=$tag_name" >> $GITHUB_OUTPUT
           echo "Latest version: $tag_name"
 
       - name: Check if the release exists locally
         id: check_local_tag
         run: |
-          if git rev-parse "refs/tags/v${{ env.TAG_NAME }}" >/dev/null 2>&1; then
-            echo "SHOULD_BUILD=false" >> $GITHUB_ENV
-            echo "Release v${{ env.TAG_NAME }} already exists locally. Skipping build."
+          if git rev-parse "refs/tags/v${{ steps.get_latest_release.outputs.tag_name }}" >/dev/null 2>&1; then
+            echo "should_build=false" >> $GITHUB_OUTPUT
+            echo "Release v${{ steps.get_latest_release.outputs.tag_name }} already exists locally. Skipping build."
           else
-            echo "SHOULD_BUILD=true" >> $GITHUB_ENV
+            echo "should_build=true" >> $GITHUB_OUTPUT
             echo "No matching release found. Proceeding with build."
           fi
 
       - name: Set up build environment
-        if: env.SHOULD_BUILD == 'true'
+        if: steps.check_local_tag.outputs.should_build == 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y zip unzip
 
       - name: Grant execution permissions to build script
-        if: env.SHOULD_BUILD == 'true'
+        if: steps.check_local_tag.outputs.should_build == 'true'
         run: chmod +x ./zenmake_all_platforms.sh
 
       - name: Run the build script
-        if: env.SHOULD_BUILD == 'true'
+        if: steps.check_local_tag.outputs.should_build == 'true'
         run: ./zenmake_all_platforms.sh
 
       - name: Verify build artifacts
-        if: env.SHOULD_BUILD == 'true'
+        if: steps.check_local_tag.outputs.should_build == 'true'
         run: |
           for file in zen-linux-x86_64-portable.zip zen-linux-aarch64-portable.zip zen-windows-x86_64-portable.zip zen-windows-arm64-portable.zip zen-macos-universal-portable.zip zen-portable.zip; do
             if [ ! -f "$file" ]; then
@@ -67,20 +70,20 @@ jobs:
           done
 
       - name: Create GitHub Release
-        if: env.SHOULD_BUILD == 'true'
+        if: steps.check_local_tag.outputs.should_build == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Creating release v${{ env.TAG_NAME }}..."
-          gh release create "v${{ env.TAG_NAME }}" \
+          echo "Creating release v${{ steps.get_latest_release.outputs.tag_name }}..."
+          gh release create "v${{ steps.get_latest_release.outputs.tag_name }}" \
             zen-linux-x86_64-portable.zip \
             zen-linux-aarch64-portable.zip \
             zen-windows-x86_64-portable.zip \
             zen-windows-arm64-portable.zip \
             zen-macos-universal-portable.zip \
             zen-portable.zip \
-            --title "Zen Browser v${{ env.TAG_NAME }}" \
-            --notes "Automated build for release v${{ env.TAG_NAME }}
+            --title "Zen Browser v${{ steps.get_latest_release.outputs.tag_name }}" \
+            --notes "Automated build for release v${{ steps.get_latest_release.outputs.tag_name }}
           
           Supported Platforms:
           
