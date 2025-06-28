@@ -21,15 +21,18 @@ jobs:
         id: get_latest_release
         run: |
           response=$(curl -sL -w "%{http_code}" \
-            -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
             https://api.github.com/repos/zen-browser/desktop/releases/latest -o response.json)
           if [ "$response" != "200" ]; then
             echo "Error: Failed to fetch latest release (HTTP $response)"
+            echo "Response content:"
+            cat response.json
             exit 1
           fi
           tag_name=$(jq -r '.tag_name' response.json)
           if [ -z "$tag_name" ] || [ "$tag_name" = "null" ]; then
             echo "Error: Could not parse tag name from response"
+            echo "Response content:"
+            cat response.json
             exit 1
           fi
           echo "TAG_NAME=$tag_name" >> $GITHUB_ENV
@@ -73,7 +76,7 @@ jobs:
       - name: Create GitHub Release
         if: env.SHOULD_BUILD == 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Creating release ${{ env.TAG_NAME }}..."
           if ! gh release create "${{ env.TAG_NAME }}" \
