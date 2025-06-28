@@ -57,51 +57,91 @@ zen-portable/
 
 ---
 
-### 🔨 Option 2: Build from Source (Linux)
+### 🔨 Option 2: Build from Source
 
-> ⚠️ **Note**: This method requires Linux but creates portable versions that work on Linux, Windows, and macOS.
+> 💡 **Cross-Platform Support**: Build scripts are available for both Linux/macOS (Bash) and Windows (PowerShell).
 
 #### Automatic Build (All Platforms)
 
+**For Linux/macOS:**
 1. **Download** the automatic build script:
    ```bash
-   wget https://raw.githubusercontent.com/ramhaidar/Zen-Browser-Portable/main/zenmake_auto.sh
+   wget https://raw.githubusercontent.com/ramhaidar/Zen-Browser-Portable/main/zenmake_all_platforms.sh
    ```
 
 2. **Make executable**:
    ```bash
-   chmod +x zenmake_auto.sh
+   chmod +x zenmake_all_platforms.sh
    ```
 
 3. **Run the build script**:
    ```bash
-   ./zenmake_auto.sh
+   ./zenmake_all_platforms.sh
    ```
 
-   This will automatically build portable versions for all platforms (Linux, Windows, and macOS).
+**For Windows:**
+1. **Download** the PowerShell build script:
+   ```powershell
+   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/ramhaidar/Zen-Browser-Portable/main/zenmake_all_platforms.ps1" -OutFile "zenmake_all_platforms.ps1"
+   ```
+
+2. **Run the build script**:
+   ```powershell
+   .\zenmake_all_platforms.ps1
+   ```
+
+This will automatically build portable versions for all platforms (Linux, Windows, and macOS).
 
 #### Interactive Build (Choose Platforms)
 
+**For Linux/macOS:**
 1. **Download** the interactive build script:
    ```bash
-   wget https://raw.githubusercontent.com/ramhaidar/Zen-Browser-Portable/main/zenmake_interactive.sh
+   wget https://raw.githubusercontent.com/ramhaidar/Zen-Browser-Portable/main/zenmake_with_choice.sh
    ```
 
 2. **Make executable**:
    ```bash
-   chmod +x zenmake_interactive.sh
+   chmod +x zenmake_with_choice.sh
    ```
 
 3. **Run the interactive build script**:
    ```bash
-   ./zenmake_interactive.sh
+   ./zenmake_with_choice.sh
    ```
 
-   This will allow you to choose which platform(s) you want to build - you can select specific platforms or build all of them.
+**For Windows:**
+1. **Download** the PowerShell interactive build script:
+   ```powershell
+   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/ramhaidar/Zen-Browser-Portable/main/zenmake_with_choice.ps1" -OutFile "zenmake_with_choice.ps1"
+   ```
+
+2. **Run the interactive build script**:
+   ```powershell
+   .\zenmake_with_choice.ps1
+   ```
+
+This will allow you to choose which platform(s) you want to build - you can select specific platforms or build all of them.
 
 4. **Deploy**: The script(s) will create ZIP files for the selected platform(s). Extract the appropriate one to your portable storage device.
 
 5. **Launch**: Use the appropriate launcher script for your platform.
+
+#### Clean Build Artifacts
+
+After building, you can clean up temporary build files and artifacts:
+
+**For Linux/macOS:**
+```bash
+./clean_build_artifacts.sh
+```
+
+**For Windows:**
+```powershell
+.\clean_build_artifacts.ps1
+```
+
+This will remove all generated ZIP files, extracted directories, and temporary build artifacts.
 
 ## 💡 Usage Tips
 
@@ -109,6 +149,8 @@ zen-portable/
 - ⚙️ **Customization**: Modify the launcher scripts to adjust paths or add custom options
 - 💾 **Data Persistence**: All your bookmarks, history, and settings are automatically saved to the `data/` folder
 - 🔄 **Updates**: To update, simply replace the `app/` folder with a newer version while keeping your `data/` folder intact
+- 🧹 **Cleanup**: Use the provided cleanup scripts (`clean_build_artifacts.sh` or `clean_build_artifacts.ps1`) to remove build artifacts after creating your portable packages
+- 🖥️ **Cross-Platform Building**: Choose between Bash scripts (Linux/macOS) or PowerShell scripts (Windows) for building portable packages
 
 ---
 
@@ -117,6 +159,16 @@ zen-portable/
 <details>
 <summary><strong>Does this work on macOS?</strong></summary>
 Yes! This portable setup now supports Windows, Linux, and macOS. Use the appropriate launcher script for your platform.
+</details>
+
+<details>
+<summary><strong>What's the difference between the build scripts?</strong></summary>
+We provide two types of build scripts:
+<ul>
+<li><strong>zenmake_all_platforms</strong>: Automatically builds portable versions for all platforms (Linux, Windows, and macOS)</li>
+<li><strong>zenmake_with_choice</strong>: Interactive script that lets you choose which specific platform(s) to build</li>
+</ul>
+Both are available in Bash (.sh) for Linux/macOS and PowerShell (.ps1) for Windows.
 </details>
 
 <details>
