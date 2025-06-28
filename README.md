@@ -3,7 +3,7 @@
 # 🌟 Zen Browser Portable
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey.svg)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)
 ![Version](https://img.shields.io/badge/version-latest-green.svg)
 
 **🚀 A fully portable setup for Zen Browser that runs directly from a USB drive or any folder**
@@ -17,7 +17,7 @@
 ## ✨ Features
 
 🔹 **Fully Portable** - Run from USB drives, external storage, or any folder  
-🔹 **Cross-Platform** - Works seamlessly on Windows and Linux  
+🔹 **Cross-Platform** - Works seamlessly on Windows, Linux, and macOS  
 🔹 **Self-Contained** - All user data stored in local `Data` directory  
 🔹 **Zero Installation** - No system modifications required  
 🔹 **Privacy-Focused** - Complete control over your browsing data  
@@ -29,12 +29,14 @@
 zen-portable/
 ├── 📁 app/                         # Core application files
 │   ├── 🐧 lin/                     # Linux executable files
-│   └── 🪟 win/                     # Windows executable files
+│   ├── 🪟 win/                     # Windows executable files
+│   └── 🍎 mac/                     # macOS executable files
 ├── 💾 data/
 │   └── 👤 profile/                 # Browser profile & user data
 └── 🚀 launcher/
     ├── 🪟 zenwindowsportable.bat   # Windows launcher script
-    └── 🐧 zenlinuxportable.sh      # Linux launcher script
+    ├── 🐧 zenlinuxportable.sh      # Linux launcher script
+    └── 🍎 zenmacosportable.sh      # macOS launcher script
 ```
 
 
@@ -43,12 +45,13 @@ zen-portable/
 
 ### 📥 Option 1: Download Pre-built Release
 
-1. **Download** the latest [Zen Browser Portable](https://github.com/wysh3/Zen-Browser-Portable/releases) release
+1. **Download** the latest [Zen Browser Portable](https://github.com/ramhaidar/Zen-Browser-Portable/releases) release
 2. **Extract** the ZIP file to your desired location (USB drive, folder, etc.)
 3. **Navigate** to the extracted folder
 4. **Launch** the browser:
    - **Windows**: Double-click `launcher/zenwindowsportable.bat`
    - **Linux**: Double-click `launcher/zenlinuxportable.sh` or run via terminal
+   - **macOS**: Double-click `launcher/zenmacosportable.sh` or run via terminal
 
 > 💡 **Tip**: Your portable browser is now ready to use! All data will be saved in the `data/` folder.
 
@@ -56,24 +59,47 @@ zen-portable/
 
 ### 🔨 Option 2: Build from Source (Linux)
 
-> ⚠️ **Note**: This method requires Linux but creates a portable version that works on both Linux and Windows.
+> ⚠️ **Note**: This method requires Linux but creates portable versions that work on Linux, Windows, and macOS.
 
-1. **Download** the build script:
+#### Automatic Build (All Platforms)
+
+1. **Download** the automatic build script:
    ```bash
-   wget https://raw.githubusercontent.com/wysh3/Zen-Browser-Portable/main/zenmake.sh
+   wget https://raw.githubusercontent.com/ramhaidar/Zen-Browser-Portable/main/zenmake_auto.sh
    ```
 
 2. **Make executable**:
    ```bash
-   chmod +x zenmake.sh
+   chmod +x zenmake_auto.sh
    ```
 
 3. **Run the build script**:
    ```bash
-   ./zenmake.sh
+   ./zenmake_auto.sh
    ```
 
-4. **Deploy**: The script will create a ZIP file. Extract it to your portable storage device.
+   This will automatically build portable versions for all platforms (Linux, Windows, and macOS).
+
+#### Interactive Build (Choose Platforms)
+
+1. **Download** the interactive build script:
+   ```bash
+   wget https://raw.githubusercontent.com/ramhaidar/Zen-Browser-Portable/main/zenmake_interactive.sh
+   ```
+
+2. **Make executable**:
+   ```bash
+   chmod +x zenmake_interactive.sh
+   ```
+
+3. **Run the interactive build script**:
+   ```bash
+   ./zenmake_interactive.sh
+   ```
+
+   This will allow you to choose which platform(s) you want to build - you can select specific platforms or build all of them.
+
+4. **Deploy**: The script(s) will create ZIP files for the selected platform(s). Extract the appropriate one to your portable storage device.
 
 5. **Launch**: Use the appropriate launcher script for your platform.
 
@@ -90,7 +116,7 @@ zen-portable/
 
 <details>
 <summary><strong>Does this work on macOS?</strong></summary>
-Currently, this portable setup is designed for Windows and Linux. macOS support may be added in future releases.
+Yes! This portable setup now supports Windows, Linux, and macOS. Use the appropriate launcher script for your platform.
 </details>
 
 <details>
@@ -100,7 +126,7 @@ Yes! You can copy your existing profile data to the `data/profile/` folder to mi
 
 <details>
 <summary><strong>Is this an official Zen Browser project?</strong></summary>
-No, this is a community-created portable wrapper for Zen Browser. For official Zen Browser releases, visit the official Zen Browser repository.
+No, this is a community-created portable wrapper for Zen Browser. For official Zen Browser releases, visit the official Zen Browser repository at <a href="https://github.com/zen-browser/desktop">https://github.com/zen-browser/desktop</a>.
 </details>
 
 ---
@@ -133,8 +159,8 @@ This project is licensed under the [MIT License](LICENSE) - see the LICENSE file
 
 **Made with ❤️ for the Zen Browser community**
 
-[![GitHub stars](https://img.shields.io/github/stars/wysh3/Zen-Browser-Portable?style=social)](https://github.com/wysh3/Zen-Browser-Portable/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/wysh3/Zen-Browser-Portable?style=social)](https://github.com/wysh3/Zen-Browser-Portable/network/members)
+[![GitHub stars](https://img.shields.io/github/stars/ramhaidar/Zen-Browser-Portable?style=social)](https://github.com/ramhaidar/Zen-Browser-Portable/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/ramhaidar/Zen-Browser-Portable?style=social)](https://github.com/ramhaidar/Zen-Browser-Portable/network/members)
 
 *If you find this project helpful, please consider giving it a ⭐!*
 
