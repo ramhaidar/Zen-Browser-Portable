@@ -57,16 +57,16 @@ jobs:
 
       - name: Grant execution permissions to build script
         if: env.SHOULD_BUILD == 'true'
-        run: chmod +x ./zenmake_for_dev.sh
+        run: chmod +x ./zenmake_for_dev_multiplatform.sh
 
       - name: Run the build script
         if: env.SHOULD_BUILD == 'true'
-        run: ./zenmake_for_dev.sh
+        run: ./zenmake_for_dev_multiplatform.sh
 
       - name: Verify build artifacts
         if: env.SHOULD_BUILD == 'true'
         run: |
-          for file in zen-linux-portable.zip zen-windows-portable.zip zen-portable.zip; do
+          for file in zen-linux-x86_64-portable.zip zen-linux-aarch64-portable.zip zen-windows-x86_64-portable.zip zen-windows-arm64-portable.zip zen-macos-universal-portable.zip zen-portable.zip; do
             if [ ! -f "$file" ]; then
               echo "Error: Build artifact $file is missing"
               exit 1
@@ -79,13 +79,31 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Creating release v${{ env.TAG_NAME }}..."
-          if ! gh release create "v${{ env.TAG_NAME }}" \
-            zen-linux-portable.zip \
-            zen-windows-portable.zip \
+          gh release create "v${{ env.TAG_NAME }}" \
+            zen-linux-x86_64-portable.zip \
+            zen-linux-aarch64-portable.zip \
+            zen-windows-x86_64-portable.zip \
+            zen-windows-arm64-portable.zip \
+            zen-macos-universal-portable.zip \
             zen-portable.zip \
             --title "Zen Browser v${{ env.TAG_NAME }}" \
-            --notes "Automated build for release v${{ env.TAG_NAME }}" \
-            --repo ${{ github.repository }}; then
-            echo "Error: Failed to create release"
-            exit 1
-          fi
+            --notes "Automated build for release v${{ env.TAG_NAME }}
+          
+          Supported Platforms:
+          
+          Linux:
+          - zen-linux-x86_64-portable.zip (x86_64 64-bit)
+          - zen-linux-aarch64-portable.zip (aarch64 ARM 64-bit)
+          
+          Windows:
+          - zen-windows-x86_64-portable.zip (x86_64 64-bit)
+          - zen-windows-arm64-portable.zip (ARM64)
+          
+          macOS:
+          - zen-macos-universal-portable.zip (Universal - Intel and Apple Silicon)
+          
+          Universal:
+          - zen-portable.zip (All platforms in one package)
+          
+          Each package is fully portable and includes launchers for easy use." \
+            --repo ${{ github.repository }}
