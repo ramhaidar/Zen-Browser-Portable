@@ -19,20 +19,13 @@ jobs:
           
       - name: Get the latest release from Zen Browser
         id: get_latest_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          response=$(curl -sL -w "%{http_code}" \
-            https://api.github.com/repos/zen-browser/desktop/releases/latest -o response.json)
-          if [ "$response" != "200" ]; then
-            echo "Error: Failed to fetch latest release (HTTP $response)"
-            echo "Response content:"
-            cat response.json
-            exit 1
-          fi
-          tag_name=$(jq -r '.tag_name' response.json)
+          # Use GitHub CLI which handles authentication automatically
+          tag_name=$(gh release view --repo zen-browser/desktop --json tagName --jq '.tagName')
           if [ -z "$tag_name" ] || [ "$tag_name" = "null" ]; then
-            echo "Error: Could not parse tag name from response"
-            echo "Response content:"
-            cat response.json
+            echo "Error: Could not get latest release tag name"
             exit 1
           fi
           echo "TAG_NAME=$tag_name" >> $GITHUB_ENV
