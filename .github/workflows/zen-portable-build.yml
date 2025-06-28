@@ -41,9 +41,9 @@ jobs:
       - name: Check if the release exists locally
         id: check_local_tag
         run: |
-          if git rev-parse "refs/tags/${{ env.TAG_NAME }}" >/dev/null 2>&1; then
+          if git rev-parse "refs/tags/v${{ env.TAG_NAME }}" >/dev/null 2>&1; then
             echo "SHOULD_BUILD=false" >> $GITHUB_ENV
-            echo "Release ${{ env.TAG_NAME }} already exists locally. Skipping build."
+            echo "Release v${{ env.TAG_NAME }} already exists locally. Skipping build."
           else
             echo "SHOULD_BUILD=true" >> $GITHUB_ENV
             echo "No matching release found. Proceeding with build."
