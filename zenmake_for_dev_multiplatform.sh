@@ -444,14 +444,14 @@ Multiple profiles are supported. Edit `data/profiles.ini` to configure additiona
 Your profile data will be stored in the `data` folder, making this truly portable.
 EOF
 
-# Create zip files
-echo "Creating zip files..."
-zip -r zen-linux-x86_64-portable.zip zen-linux-x86_64-portable
-zip -r zen-linux-aarch64-portable.zip zen-linux-aarch64-portable
-zip -r zen-windows-x86_64-portable.zip zen-windows-x86_64-portable
-zip -r zen-windows-arm64-portable.zip zen-windows-arm64-portable
-zip -r zen-macos-universal-portable.zip zen-macos-universal-portable
-zip -r zen-portable.zip zen-portable
+# Create zip files with maximum compression
+echo "Creating zip files with maximum compression..."
+zip -9 -r zen-linux-x86_64-portable.zip zen-linux-x86_64-portable
+zip -9 -r zen-linux-aarch64-portable.zip zen-linux-aarch64-portable
+zip -9 -r zen-windows-x86_64-portable.zip zen-windows-x86_64-portable
+zip -9 -r zen-windows-arm64-portable.zip zen-windows-arm64-portable
+zip -9 -r zen-macos-universal-portable.zip zen-macos-universal-portable
+zip -9 -r zen-portable.zip zen-portable
 
 # Clean up
 echo "Cleaning up temporary files..."
